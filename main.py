@@ -3,6 +3,7 @@
 # throughout this file
 import pygame
 from constants import *
+from player import *
 
 def main():
     pygame.init()
@@ -10,16 +11,25 @@ def main():
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     game_clock = pygame.time.Clock()
     dt = 0
-    while True:
+    running = True
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return
+                running = False
+
         screen.fill((0,0,0))
+        
+        # Draw the player
+        player.draw(screen)  
+
+        # FPS text
         font = pygame.font.Font(None, 36)  # None uses default font, 36 is size
         fps_text = font.render(f"FPS: {game_clock.get_fps():.1f}", True, (255, 255, 255))
         screen.blit(fps_text, (10, 10))  # Position at top-left corner
+
         pygame.display.flip()
         dt = game_clock.tick(60)/1000
 
