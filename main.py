@@ -4,6 +4,8 @@
 import pygame
 from constants import *
 from player import *
+from asteroid import *
+from asteroidfield import *
 
 def main():
     pygame.init()
@@ -13,13 +15,19 @@ def main():
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
+    asteroids = pygame.sprite.Group()
 
     Player.containers = (updatable, drawable)
+    Asteroid.containers = (asteroids, updatable, drawable)
+    AsteroidField.containers = (updatable)
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     game_clock = pygame.time.Clock()
     dt = 0
+
+    # Create asteroid field after screen setup and before game loop
+    asteroid_field = AsteroidField()
     running = True
     while running:
         for event in pygame.event.get():
@@ -31,6 +39,9 @@ def main():
         # Draw the player
         for player in drawable:
             player.draw(screen)  
+        
+        for asteroid in drawable:
+            asteroid.draw(screen)
 
         # FPS text
         font = pygame.font.Font(None, 36)  # None uses default font, 36 is size
@@ -42,6 +53,12 @@ def main():
 
         for player in updatable:
             player.update(dt) 
+        
+        for asteroid in updatable:
+            asteroid.update(dt)
+        
+        for asteroidField in updatable:
+            asteroidField.update(dt)
 
 if __name__ == "__main__":
     main()
