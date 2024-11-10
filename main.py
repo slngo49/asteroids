@@ -6,6 +6,7 @@ from constants import *
 from player import *
 from asteroid import *
 from asteroidfield import *
+import sys
 
 def main():
     pygame.init()
@@ -16,10 +17,12 @@ def main():
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
+    shots = pygame.sprite.Group()
 
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
-    AsteroidField.containers = (updatable)
+    AsteroidField.containers = (updatable,)
+    Shot.containers = (updatable, drawable, shots)
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
@@ -34,31 +37,32 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
+        for entity in updatable:
+            entity.update(dt)
+
+        for asteroid in asteroids:
+            if player.collides_with(asteroid):
+                print("Game over!")
+                sys.exit()
+            for shot in shots:
+                if shot.collides_with(asteroid):
+                    shot.kill()
+                    asteroid.split()
+
         screen.fill((0,0,0))
         
-        # Draw the player
-        for player in drawable:
-            player.draw(screen)  
-        
-        for asteroid in drawable:
-            asteroid.draw(screen)
+        for entity in drawable:
+            entity.draw(screen)
 
         # FPS text
         font = pygame.font.Font(None, 36)  # None uses default font, 36 is size
         fps_text = font.render(f"FPS: {game_clock.get_fps():.1f}", True, (255, 255, 255))
         screen.blit(fps_text, (10, 10))  # Position at top-left corner
 
+        
         pygame.display.flip()
+        
         dt = game_clock.tick(60)/1000
-
-        for player in updatable:
-            player.update(dt) 
-        
-        for asteroid in updatable:
-            asteroid.update(dt)
-        
-        for asteroidField in updatable:
-            asteroidField.update(dt)
 
 if __name__ == "__main__":
     main()
